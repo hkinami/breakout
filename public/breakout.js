@@ -170,21 +170,15 @@ class Ball {
 }
 
 class Brick {
-    constructor(x, y, points) {
+    constructor(x, y) {
         this.brick = document.createElement("div");
         this.brick.setAttribute('class', 'brick');
         this.brick.style.left = x + 'px';
         this.brick.style.top = y + 'px';
-        this.brick.dataset.points = points;
-        this.brick.innerHTML = points;
     }
 
     element() {
         return this.brick
-    }
-
-    points() {
-        return parseInt(this.brick.dataset.points)
     }
 
     rect() {
@@ -218,7 +212,6 @@ class BreakOut {
         this.ball = new Ball(document.querySelector('#ball'))
         this.button = document.querySelector("#start");
         this.livesSpan = document.querySelector("#lives");
-        this.pointsSpan = document.querySelector("#points");
 
         document.addEventListener("keydown", this.keyDown.bind(this) )
         document.addEventListener("keyup", this.keyUp.bind(this) )
@@ -235,8 +228,7 @@ class BreakOut {
         this.button.innerHTML = "Start"
         this.lives = 3
         this.livesSpan.innerHTML = this.lives
-        this.points = 0
-        this.pointsSpan.innerHTML = this.points
+
         this.ball.reset()
         this.container.reset()
         this.setupBricks(3)
@@ -250,8 +242,7 @@ class BreakOut {
             let y = row * 70
             
             while( x < width - 100 ) {
-                let point = Math.ceil(Math.random() * 10 + 2)
-                let brick = new Brick(x, y, point)
+                let brick = new Brick(x, y)
                 this.container.append(brick)
                 x += 100
             }
@@ -314,18 +305,13 @@ class BreakOut {
         return null
     }
 
-    countup(brick) {
-        this.points += brick.points()
-        this.pointsSpan.innerHTML = this.points
-    }
-
     update() {
         this.paddle.move()
         this.ball.move()
         
         const brick = this.hitBlock()
         if (brick) {
-            this.countup(brick)
+            console.log("Hit")
         } else {
             if (! this.bounceBall()) {
                 -- this.lives
