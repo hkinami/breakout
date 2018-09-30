@@ -5,17 +5,6 @@ class Container {
         this.bricks = []
     }
 
-    reset() {
-        for( let blick of this.bricks) {
-            this.container.removeChild(blick.element())
-        }
-        this.bricks = []
-        let messages = document.getElementsByClassName('message');
-        for(let i=0; i<messages.length; ++i) {
-            this.container.removeChild(messages.item(i))
-        }
-    }
-
     rect() {
         return this.container.getBoundingClientRect()
     }
@@ -220,7 +209,6 @@ class BreakOut {
         this.button.innerHTML = "Start"
 
         this.ball.reset()
-        this.container.reset()
         this.setupBricks(3)
     }
 
@@ -241,10 +229,7 @@ class BreakOut {
     }
 
     start() {
-        if (this.button.innerHTML === "Restart") {
-            this.reset()
-            this.button.innerHTML = "Start"
-        } else if (this.animation === null) {
+        if (this.animation === null) {
             this.button.innerHTML = "Pause"
             this.animation = requestAnimationFrame(this.update.bind(this));
         } else {
@@ -300,7 +285,6 @@ class BreakOut {
 
         if (this.container.numOfBlocks() === 0) {
             this.container.complete()
-            this.button.innerHTML = "Restart"
         } else {
             this.animation = requestAnimationFrame(this.update.bind(this));
         }
