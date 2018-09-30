@@ -30,9 +30,8 @@ class Ball {
     reset() {
         this.ball.style.left = '50%'
         this.ball.style.top = '50%'
-        
-        this.direction.x = 4
-        this.direction.x = 5
+
+        this.direction = { x:4, y:5 }
     }
 
     move() {
