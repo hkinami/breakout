@@ -54,13 +54,6 @@ class Container {
         return this.bricks.length
     }
 
-    gameOver() {
-        let message = document.createElement("div");
-        message.setAttribute('class', 'message');
-        message.innerHTML = "Game Over"
-        this.container.appendChild(message)
-    }
-
     complete() {
         let message = document.createElement("div");
         message.setAttribute('class', 'message');
@@ -211,7 +204,6 @@ class BreakOut {
         this.paddle = new Paddle(document.querySelector('#paddle'))
         this.ball = new Ball(document.querySelector('#ball'))
         this.button = document.querySelector("#start");
-        this.livesSpan = document.querySelector("#lives");
 
         document.addEventListener("keydown", this.keyDown.bind(this) )
         document.addEventListener("keyup", this.keyUp.bind(this) )
@@ -226,8 +218,6 @@ class BreakOut {
         }
         this.animation = null
         this.button.innerHTML = "Start"
-        this.lives = 3
-        this.livesSpan.innerHTML = this.lives
 
         this.ball.reset()
         this.container.reset()
@@ -309,23 +299,11 @@ class BreakOut {
         this.paddle.move()
         this.ball.move()
         
-        const brick = this.hitBlock()
-        if (brick) {
-            console.log("Hit")
-        } else {
-            if (! this.bounceBall()) {
-                -- this.lives
-                this.livesSpan.innerHTML = this.lives
-                if ( this.lives <= 0 ) {
-                    this.container.gameOver()
-                    this.button.innerHTML = "Restart"
-                } else {
-                    this.animation = null;
-                    this.button.innerHTML = "Start"
-                    this.ball.reset()
-                }
-                return
-            }
+        this.hitBlock()
+        if (! this.bounceBall()) {
+            this.button.innerHTML = "Start"
+            this.ball.reset()
+            return
         }
 
         if (this.container.numOfBlocks() === 0) {
