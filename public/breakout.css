@@ -37,23 +37,11 @@
       background-color: black;
       position: relative;
     }
-
-    #paddle {
-      height: 10px;
-      width: 80px;
-      border: 1px solid white;
-      background-color: white;
-      border-radius: 10px;
-
-      position: absolute;
-      left: 50%;
-      bottom: 30px;
-    }
-
+    
     #ball {
       height: 10px;
       width: 10px;
-      border-radius: 10px;
+      border-radius: 50%;
       border: 1px solid white;
       background-color: white;
 
