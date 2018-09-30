@@ -271,11 +271,8 @@ class BreakOut {
         const bounce = this.container.isCollide(this.ball)
         if ( bounce === "right" || bounce === "left" ) {
             this.ball.turnX()
-        } else if ( bounce === "top") {
+        } else if ( bounce === "top" || bounce === "bottom") {
             this.ball.turnY()
-        } else if (bounce === "bottom") {
-            this.ball.turnY()
-            return false
         }
     
         const hitPosion = this.paddle.isCollide(this.ball)
@@ -283,7 +280,6 @@ class BreakOut {
             this.ball.setX(hitPosion)
             this.ball.turnY()
         }
-        return true
     }
 
     hitBlock() {
@@ -300,11 +296,7 @@ class BreakOut {
         this.ball.move()
         
         this.hitBlock()
-        if (! this.bounceBall()) {
-            this.button.innerHTML = "Start"
-            this.ball.reset()
-            return
-        }
+        this.bounceBall()
 
         if (this.container.numOfBlocks() === 0) {
             this.container.complete()
