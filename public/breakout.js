@@ -2,7 +2,6 @@
 class Container {
     constructor(element) {
         this.container = element
-        this.bricks = []
     }
 
     rect() {
@@ -22,34 +21,6 @@ class Container {
         }
         return ""
     }
-
-    append(brick) {
-        this.bricks.push(brick)
-        this.container.appendChild(brick.element())
-    }
-
-    removeHitBlock(ball) {
-        const index = this.bricks.findIndex( (brick) => brick.isCollide(ball) !== 0 )
-        if (index >= 0) {
-            const brick = this.bricks[index]
-            brick.remove()
-            this.bricks.splice(index, 1)
-            return brick
-        }
-        return null
-    }
-
-    numOfBlocks() {
-        return this.bricks.length
-    }
-
-    complete() {
-        let message = document.createElement("div");
-        message.setAttribute('class', 'message');
-        message.innerHTML = "Complete"
-        this.container.appendChild(message)
-    }
-
 }
 
 class Paddle {
@@ -151,42 +122,6 @@ class Ball {
     }
 }
 
-class Brick {
-    constructor(x, y) {
-        this.brick = document.createElement("div");
-        this.brick.setAttribute('class', 'brick');
-        this.brick.style.left = x + 'px';
-        this.brick.style.top = y + 'px';
-    }
-
-    element() {
-        return this.brick
-    }
-
-    rect() {
-        return this.brick.getBoundingClientRect()
-    }
-
-    remove() {
-        this.brick.parentNode.removeChild(this.brick)
-    }
-
-    isCollide(ball) {
-        const rect = this.rect()
-        var rectBall = ball.rect();
-        
-        if ( !(
-            rect.bottom < rectBall.top ||
-            rect.top > rectBall.bottom ||
-            rect.right < rectBall.left ||
-            rect.left > rectBall.right
-        )) {
-            return ((rectBall.x - rect.x) / rect.width) * 10 - 5
-        }
-        return 0
-    }
-}
-
 class BreakOut {
     constructor() {
         this.container = new Container(document.querySelector('#container'))
@@ -209,23 +144,6 @@ class BreakOut {
         this.button.innerHTML = "Start"
 
         this.ball.reset()
-        this.setupBricks(3)
-    }
-
-    setupBricks(numRow) {
-        const width = this.container.rect().width
-        for(let row=0; row < numRow; ++row) {
-            
-            let x = width % 100 / 2
-            let y = row * 70
-            
-            while( x < width - 100 ) {
-                let brick = new Brick(x, y)
-                this.container.append(brick)
-                x += 100
-            }
-        }
-        
     }
 
     start() {
@@ -267,27 +185,13 @@ class BreakOut {
         }
     }
 
-    hitBlock() {
-        const brick = this.container.removeHitBlock(this.ball)
-        if (brick !== null) {
-            this.ball.turnY()
-            return brick
-        }
-        return null
-    }
-
     update() {
         this.paddle.move()
         this.ball.move()
         
-        this.hitBlock()
         this.bounceBall()
 
-        if (this.container.numOfBlocks() === 0) {
-            this.container.complete()
-        } else {
-            this.animation = requestAnimationFrame(this.update.bind(this));
-        }
+        this.animation = requestAnimationFrame(this.update.bind(this));
     }
 }
 
