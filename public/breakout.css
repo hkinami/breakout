@@ -10,25 +10,6 @@
       font-family: 'Bungee Shade', sans-serif;
     }
 
-    .controll {
-      text-align: center;
-    }
-    
-    #start {
-      font-size: 30px;
-      font-family: 'Bungee Shade', sans-serif;
-      background-color: tomato;
-      color: white;
-      padding: 15px;
-      border: none;
-      outline: none;
-      border-radius: 20px;
-    }
-
-    #start:active {
-      opacity: 0.5;
-    }
-
     #container {
       height: 500px;
       width: 80%;

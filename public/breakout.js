@@ -55,29 +55,15 @@ class BreakOut {
     constructor() {
         this.container = new Container(document.querySelector('#container'))
         this.ball = new Ball(document.querySelector('#ball'))
-        this.button = document.querySelector("#start");
-
-        this.button.addEventListener("click", this.start.bind(this))
 
         this.animation = null
     }
 
     reset() {
         this.animation = null
-        this.button.innerHTML = "Start"
 
         this.ball.reset()
-    }
-
-    start() {
-        if (this.animation === null) {
-            this.button.innerHTML = "Pause"
-            this.animation = requestAnimationFrame(this.update.bind(this));
-        } else {
-            cancelAnimationFrame(this.animation);
-            this.animation = null;
-            this.button.innerHTML = "Start"
-        }
+        this.animation = requestAnimationFrame(this.update.bind(this));
     }
 
     bounceBall() {
