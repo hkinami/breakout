@@ -55,19 +55,6 @@ class Paddle {
         }
         this.paddle.style.left = left + 'px';
     }
-
-    isCollide(ball) {
-        const rect = this.rect()
-        var rectBall = ball.rect();
-
-        if (rect.bottom < rectBall.top || rect.top > rectBall.bottom ||
-            rect.right < rectBall.left || rect.left > rectBall.right) {
-            return Number.NaN
-        }
-
-        const hitPosition = ((rectBall.x - rect.x) / rect.width) * 10 - 5
-        return hitPosition
-    }
 }
 
 
@@ -76,8 +63,6 @@ class Ball {
         this.ball = element
         this.speed = { x: 0, y: -5 }
     }
-
-    rect() { return this.ball.getBoundingClientRect() }
 
     offsetLeft() { return this.ball.offsetLeft }
 
@@ -136,14 +121,6 @@ class BreakOut {
         }
     }
 
-    finish(message) {
-        this.status = 'finish'
-        if (this.animation !== null) {
-            cancelAnimationFrame(this.animation)
-        }
-        this.animation = null
-    }
-
     keyUp(e) {
         e.preventDefault()
         if (this.status === 'waiting' && e.key === 'ArrowUp') {
@@ -158,13 +135,6 @@ class BreakOut {
     }
 
     bounceBall() {
-        const hitPosion = this.paddle.isCollide(this.ball)
-        if (!Number.isNaN(hitPosion)) {
-            this.ball.setSpeed(hitPosion)
-            this.ball.turnY()
-            return "paddle"
-        }
-
         const bounce = this.container.isCollide(this.ball)
         if (bounce === "right" || bounce === "left") {
             this.ball.turnX()
@@ -176,18 +146,8 @@ class BreakOut {
 
     update() {
         this.paddle.move()
-
-        if (this.status === 'finish' || this.status === 'initial') {
-            return
-        } else if (this.status === 'waiting') {
-            this.ball.moveToOn(this.paddle.element())
-        } else {
-            this.ball.move()
-
-            if (this.bounceBall() === 'bottom') {
-                this.status = 'waiting'
-            }
-        }
+        this.ball.move()
+        this.bounceBall()
         this.animation = requestAnimationFrame(this.update.bind(this));
     }
 }
