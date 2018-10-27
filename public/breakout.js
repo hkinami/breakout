@@ -135,13 +135,11 @@ class Ball {
 }
 
 class Brick {
-    constructor(x, y, points) {
+    constructor(x, y) {
         this.brick = document.createElement("div");
         this.brick.setAttribute('class', 'brick');
         this.brick.style.left = x + 'px';
         this.brick.style.top = y + 'px';
-
-        this.brick.innerText = points;
     }
 
     element() { return this.brick }
@@ -159,9 +157,7 @@ class Brick {
             return false
         }
         return true
-    }
-    
-    points() { return parseInt(this.brick.innerText) }
+    }    
 }
 
 class BreakOut {
@@ -171,7 +167,6 @@ class BreakOut {
         this.paddle = new Paddle(document.querySelector('#paddle'))
         this.ball = new Ball(document.querySelector('#ball'))
         this.livesSpan = document.querySelector("#lives");
-        this.pointsSpan = document.querySelector("#points");
         this.button = document.querySelector("#start")
 
         this.button.addEventListener("click", this.start.bind(this))
@@ -190,8 +185,7 @@ class BreakOut {
             let y = row * 70
 
             while (x < width - 100) {
-                let point = Math.ceil(Math.random() * 10 + 2)
-                let brick = new Brick(x, y, point)
+                let brick = new Brick(x, y)
                 this.container.append(brick)
                 x += 100
             }
@@ -256,15 +250,7 @@ class BreakOut {
         const brick = this.container.removeHitBlock(this.ball)
         if (brick !== null) {
             this.ball.turnY()
-            this.countup(brick)
         }
-    }
-
-    countup(brick) {
-        let points = parseInt(this.pointsSpan.innerText)
-        points += brick.points()
-        this.pointsSpan.innerText = points
-        return points
     }
 
     decrementLives() {
