@@ -45,7 +45,6 @@ class Ball {
 
 class BreakOut {
     constructor() {
-        this.status = 'initial'
         this.container = new Container(document.querySelector('#container'))
         this.paddle = new Paddle(document.querySelector('#paddle'))
         this.ball = new Ball(document.querySelector('#ball'))
@@ -59,11 +58,8 @@ class BreakOut {
     }
 
     start() {
-        if (this.status === 'finish') {
-            location.reload();
-        } else if (this.animation === null) {
+        if (this.animation === null) {
             this.button.innerHTML = 'Pause'
-            this.status = 'waiting'
             this.animation = requestAnimationFrame(this.update.bind(this))
         } else {
             this.button.innerHTML = 'Start'
@@ -74,9 +70,6 @@ class BreakOut {
 
     keyUp(e) {
         e.preventDefault()
-        if (this.status === 'waiting' && e.key === 'ArrowUp') {
-            this.status = 'moving'
-        }
         this.paddle.keyUp(e)
     }
 
