@@ -14,25 +14,18 @@ class Paddle {
     keyDown(event) {
         if (event.key === "ArrowRight") {
             this.direction = "right"
+            console.log(this.direction)
         } else if (event.key === "ArrowLeft") {
             this.direction = "left"
+            console.log(this.direction)
         }
     }
 
     keyUp(event) {
         if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
             this.direction = "stop"
+            console.log(this.direction)
         }
-    }
-
-    move() {
-        let left = this.paddle.offsetLeft;
-        if (this.direction === "left") {
-            left -= 5;
-        } else if (this.direction === "right") {
-            left += 5;
-        }
-        this.paddle.style.left = left + 'px';
     }
 }
 
@@ -50,22 +43,8 @@ class BreakOut {
         this.ball = new Ball(document.querySelector('#ball'))
         this.button = document.querySelector("#start")
 
-        this.button.addEventListener("click", this.start.bind(this))
         document.addEventListener("keydown", this.keyDown.bind(this))
         document.addEventListener("keyup", this.keyUp.bind(this))
-
-        this.animation = null
-    }
-
-    start() {
-        if (this.animation === null) {
-            this.button.innerHTML = 'Pause'
-            this.animation = requestAnimationFrame(this.update.bind(this))
-        } else {
-            this.button.innerHTML = 'Start'
-            cancelAnimationFrame(this.animation)
-            this.animation = null
-        }
     }
 
     keyUp(e) {
@@ -76,11 +55,6 @@ class BreakOut {
     keyDown(e) {
         e.preventDefault()
         this.paddle.keyDown(e)
-    }
-
-    update() {
-        this.paddle.move()
-        this.animation = requestAnimationFrame(this.update.bind(this));
     }
 }
 
