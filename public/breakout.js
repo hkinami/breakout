@@ -10,23 +10,6 @@ class Paddle {
         this.paddle = element
         this.direction = 'stop'
     }
-
-    keyDown(event) {
-        if (event.key === "ArrowRight") {
-            this.direction = "right"
-            console.log(this.direction)
-        } else if (event.key === "ArrowLeft") {
-            this.direction = "left"
-            console.log(this.direction)
-        }
-    }
-
-    keyUp(event) {
-        if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-            this.direction = "stop"
-            console.log(this.direction)
-        }
-    }
 }
 
 
@@ -42,19 +25,6 @@ class BreakOut {
         this.paddle = new Paddle(document.querySelector('#paddle'))
         this.ball = new Ball(document.querySelector('#ball'))
         this.button = document.querySelector("#start")
-
-        document.addEventListener("keydown", this.keyDown.bind(this))
-        document.addEventListener("keyup", this.keyUp.bind(this))
-    }
-
-    keyUp(e) {
-        e.preventDefault()
-        this.paddle.keyUp(e)
-    }
-
-    keyDown(e) {
-        e.preventDefault()
-        this.paddle.keyDown(e)
     }
 }
 
