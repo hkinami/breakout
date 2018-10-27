@@ -40,13 +40,6 @@ class Container {
     numOfBlocks() {
         return this.bricks.length
     }
-
-    show(message) {
-        let div = document.createElement("div");
-        div.setAttribute('class', 'message');
-        div.innerHTML = message
-        this.container.appendChild(div)
-    }
 }
 
 class Paddle {
@@ -209,7 +202,6 @@ class BreakOut {
 
     finish(message) {
         this.status = 'finish'
-        this.container.show(message)
         if (this.animation !== null) {
             cancelAnimationFrame(this.animation)
         }
