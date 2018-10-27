@@ -20,26 +20,6 @@ class Container {
         }
         return ""
     }
-
-    append(brick) {
-        this.bricks.push(brick)
-        this.container.appendChild(brick.element())
-    }
-
-    removeHitBlock(ball) {
-        const index = this.bricks.findIndex((brick) => brick.isCollide(ball))
-        if (index >= 0) {
-            const brick = this.bricks[index]
-            brick.remove()
-            this.bricks.splice(index, 1)
-            return brick
-        }
-        return null
-    }
-
-    numOfBlocks() {
-        return this.bricks.length
-    }
 }
 
 class Paddle {
@@ -127,32 +107,6 @@ class Ball {
     turnY() { this.speed.y *= -1 }
 }
 
-class Brick {
-    constructor(x, y) {
-        this.brick = document.createElement("div");
-        this.brick.setAttribute('class', 'brick');
-        this.brick.style.left = x + 'px';
-        this.brick.style.top = y + 'px';
-    }
-
-    element() { return this.brick }
-
-    rect() { return this.brick.getBoundingClientRect() }
-
-    remove() { this.brick.parentNode.removeChild(this.brick) }
-
-    isCollide(ball) {
-        const rect = this.rect()
-        var rectBall = ball.rect();
-
-        if (rect.bottom < rectBall.top || rect.top > rectBall.bottom ||
-            rect.right < rectBall.left || rect.left > rectBall.right) {
-            return false
-        }
-        return true
-    }    
-}
-
 class BreakOut {
     constructor() {
         this.status = 'initial'
@@ -165,24 +119,7 @@ class BreakOut {
         document.addEventListener("keydown", this.keyDown.bind(this))
         document.addEventListener("keyup", this.keyUp.bind(this))
 
-        this.setupBricks(3)
         this.animation = null
-    }
-
-    setupBricks(numRow) {
-        const width = this.container.rect().width
-        for (let row = 0; row < numRow; ++row) {
-
-            let x = width % 100 / 2
-            let y = row * 70
-
-            while (x < width - 100) {
-                let brick = new Brick(x, y)
-                this.container.append(brick)
-                x += 100
-            }
-        }
-
     }
 
     start() {
@@ -237,13 +174,6 @@ class BreakOut {
         return bounce
     }
 
-    judgeHittingBlock() {
-        const brick = this.container.removeHitBlock(this.ball)
-        if (brick !== null) {
-            this.ball.turnY()
-        }
-    }
-
     update() {
         this.paddle.move()
 
@@ -256,12 +186,6 @@ class BreakOut {
 
             if (this.bounceBall() === 'bottom') {
                 this.status = 'waiting'
-            }
-
-            this.judgeHittingBlock()
-            if (this.container.numOfBlocks() === 0) {
-                this.finish('Complete')
-                return
             }
         }
         this.animation = requestAnimationFrame(this.update.bind(this));
