@@ -159,7 +159,6 @@ class BreakOut {
         this.container = new Container(document.querySelector('#container'))
         this.paddle = new Paddle(document.querySelector('#paddle'))
         this.ball = new Ball(document.querySelector('#ball'))
-        this.livesSpan = document.querySelector("#lives");
         this.button = document.querySelector("#start")
 
         this.button.addEventListener("click", this.start.bind(this))
@@ -245,13 +244,6 @@ class BreakOut {
         }
     }
 
-    decrementLives() {
-        let lives = parseInt(this.livesSpan.innerText)
-        --lives
-        this.livesSpan.innerText = lives
-        return lives
-    }
-
     update() {
         this.paddle.move()
 
@@ -263,13 +255,7 @@ class BreakOut {
             this.ball.move()
 
             if (this.bounceBall() === 'bottom') {
-                const lives = this.decrementLives()
-                if (lives <= 0) {
-                    this.finish('Game Over')
-                    return
-                } else {
-                    this.status = 'waiting'
-                }
+                this.status = 'waiting'
             }
 
             this.judgeHittingBlock()
