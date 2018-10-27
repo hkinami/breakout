@@ -61,7 +61,7 @@ class Paddle {
 class Ball {
     constructor(element) {
         this.ball = element
-        this.speed = { x: 0, y: -5 }
+        this.speed = { x: 2, y: -5 }
     }
 
     offsetLeft() { return this.ball.offsetLeft }
