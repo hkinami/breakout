@@ -2,23 +2,6 @@
 class Container {
     constructor(element) {
         this.container = element
-        this.bricks = []
-    }
-
-    rect() { return this.container.getBoundingClientRect() }
-
-    isCollide(ball) {
-        const rec = this.rect()
-        if (ball.offsetLeft() <= 0) {
-            return "left"
-        } else if (rec.width <= ball.offsetLeft()) {
-            return "right"
-        } else if (ball.offsetTop() <= 0) {
-            return "top"
-        } else if (rec.height <= ball.offsetTop()) {
-            return "bottom"
-        }
-        return ""
     }
 }
 
@@ -27,10 +10,6 @@ class Paddle {
         this.paddle = element
         this.direction = 'stop'
     }
-
-    element() { return this.paddle }
-
-    rect() { return this.paddle.getBoundingClientRect() }
 
     keyDown(event) {
         if (event.key === "ArrowRight") {
@@ -61,35 +40,7 @@ class Paddle {
 class Ball {
     constructor(element) {
         this.ball = element
-        this.speed = { x: 2, y: -5 }
     }
-
-    offsetLeft() { return this.ball.offsetLeft }
-
-    offsetTop() { return this.ball.offsetTop }
-
-    moveTo(x, y) {
-        this.ball.style.left = x + 'px'
-        this.ball.style.top = y + 'px'
-    }
-
-    move() {
-        const x = this.ball.offsetLeft + this.speed.x
-        const y = this.ball.offsetTop + this.speed.y
-        this.moveTo(x, y)
-    }
-
-    moveToOn(elem) {
-        const x = (elem.offsetLeft + (elem.clientWidth / 2))
-        const y = (elem.offsetTop - this.ball.clientHeight)
-        this.moveTo(x, y)
-    }
-
-    setSpeed(speed) { this.speed.x = speed }
-
-    turnX() { this.speed.x *= -1 }
-
-    turnY() { this.speed.y *= -1 }
 }
 
 class BreakOut {
@@ -134,20 +85,8 @@ class BreakOut {
         this.paddle.keyDown(e)
     }
 
-    bounceBall() {
-        const bounce = this.container.isCollide(this.ball)
-        if (bounce === "right" || bounce === "left") {
-            this.ball.turnX()
-        } else if (bounce === "top" || bounce === "bottom") {
-            this.ball.turnY()
-        }
-        return bounce
-    }
-
     update() {
         this.paddle.move()
-        this.ball.move()
-        this.bounceBall()
         this.animation = requestAnimationFrame(this.update.bind(this));
     }
 }
