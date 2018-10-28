@@ -28,10 +28,8 @@ class Paddle {
     keyDown(event) {
         if (event.key === "ArrowRight") {
             this.direction = "right"
-            console.log(this.direction)
         } else if (event.key === "ArrowLeft") {
             this.direction = "left"
-            console.log(this.direction)
         }
     }
 
@@ -40,8 +38,19 @@ class Paddle {
     keyUp(event) {
         if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
             this.direction = "stop"
-            console.log(this.direction)
         }
+    }
+
+
+    // パドルの位置を状態に応じて移動させる
+    move() {
+        let left = this.paddle.offsetLeft;
+        if (this.direction === "left") {
+            left -= 5;
+        } else if (this.direction === "right") {
+            left += 5;
+        }
+        this.paddle.style.left = left + 'px';
     }
 }
 
@@ -76,6 +85,8 @@ class Brick {
 class BreakOut {
     constructor() {
         this.status = 'initial'  // 状態の初期化
+        this.animation = null
+
         this.container = new Container(document.querySelector('#container'))
         this.paddle = new Paddle(document.querySelector('#paddle'))
         this.ball = new Ball(document.querySelector('#ball'))
@@ -121,9 +132,9 @@ class BreakOut {
 
     // アニメーションのアップデート
     update() {
-      console.log('update')
+        this.paddle.move()
 
-      this.animation = requestAnimationFrame(this.update.bind(this))
+        this.animation = requestAnimationFrame(this.update.bind(this))
     }
 }
 
