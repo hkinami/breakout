@@ -75,6 +75,7 @@ class Brick {
  */
 class BreakOut {
     constructor() {
+        this.status = 'initial'  // 状態の初期化
         this.container = new Container(document.querySelector('#container'))
         this.paddle = new Paddle(document.querySelector('#paddle'))
         this.ball = new Ball(document.querySelector('#ball'))
@@ -105,7 +106,24 @@ class BreakOut {
     // 停止状態であれば、ボールを待ち状態にして開始
     // 動作中であれば、アニメーションを停止する
     start() {
-        console.log("Start")
+        if (this.status === 'finish') {
+            location.reload();
+        } else if (this.animation === null) {
+            this.button.innerHTML = 'Pause'
+            this.status = 'waiting'
+            this.animation = requestAnimationFrame(this.update.bind(this))
+        } else {
+            this.button.innerHTML = 'Start'
+            cancelAnimationFrame(this.animation)
+            this.animation = null
+        }
+    }
+
+    // アニメーションのアップデート
+    update() {
+      console.log('update')
+
+      this.animation = requestAnimationFrame(this.update.bind(this))
     }
 }
 
