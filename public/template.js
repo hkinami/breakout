@@ -8,6 +8,7 @@ class Container {
     // コンテナー要素の初期化と、ブロックの配列の初期化
     constructor(element) {
         this.container = element
+        this.bricks = []
     }
 
     // コンテナーの位置とサイズの情報を返す
@@ -29,6 +30,38 @@ class Container {
         }
         return ""
     }
+
+    // ブロックを追加する
+    append(brick) {
+        this.bricks.push(brick)
+        this.container.appendChild(brick.element())
+    }
+
+    // ブロックがボールに衝突していれば、ブロックを取り出して、配列から削除する
+    // 削除したブロックを返す
+    removeHitBlock(ball) {
+        const index = this.bricks.findIndex((brick) => brick.isCollide(ball))
+        if (index >= 0) {
+            const brick = this.bricks[index]
+            brick.remove()
+            this.bricks.splice(index, 1)
+            return brick
+        }
+        return null
+    }
+
+    // 現在のブロックの数を返す
+    numOfBlocks() {
+        return this.bricks.length
+    }
+
+    // コンテナーにメッセージを表示する
+    show(message) {
+        let div = document.createElement("div");
+        div.setAttribute('class', 'message');
+        div.innerHTML = message
+        this.container.appendChild(div)
+    }
 }
 
 /**
@@ -39,10 +72,18 @@ class Container {
  * ボールがパドルに衝突した時に、衝突したパドルの位置を-5から+5の範囲で返す
  */
 class Paddle {
+    // パドルの初期化と状態の初期化
     constructor(element) {
         this.paddle = element
         this.direction = 'stop'
     }
+
+    // パドル要素を返す
+    element() { return this.paddle }
+
+    // パドルの位置を返す
+    // top, bottom, right, left, width, height, 
+    rect() { return this.paddle.getBoundingClientRect() }
 
     // キーが押された時に呼び出される。
     // 押されたキーの種類によって、"right"、"left"に状態を変更する
@@ -62,7 +103,6 @@ class Paddle {
         }
     }
 
-
     // パドルの位置を状態に応じて移動させる
     move() {
         let left = this.paddle.offsetLeft;
@@ -73,8 +113,22 @@ class Paddle {
         }
         this.paddle.style.left = left + 'px';
     }
-}
 
+    // ボールが衝突した位置を、-5から+5の範囲で返す
+    // 衝突していない場合には、Number.NaNを返す
+    isCollide(ball) {
+        const rect = this.rect()
+        var rectBall = ball.rect();
+
+        if (rect.bottom < rectBall.top || rect.top > rectBall.bottom ||
+            rect.right < rectBall.left || rect.left > rectBall.right) {
+            return Number.NaN
+        }
+
+        const hitPosition = ((rectBall.x - rect.x) / rect.width) * 10 - 5
+        return hitPosition
+    }
+}
 
 /**
  * ボールクラス
@@ -87,7 +141,7 @@ class Ball {
     // ボール要素の初期化と、速度の初期値の設定
     constructor(element) {
         this.ball = element
-        this.speed = { x: 1, y: -5 }
+        this.speed = { x: 0, y: -5 }
     }
 
     // ボールの位置を返す
@@ -113,6 +167,16 @@ class Ball {
         this.moveTo(x, y)
     }
 
+    // 指定したエレメントの上に場所を移動する
+    moveToOn(elem) {
+        const x = (elem.offsetLeft + (elem.clientWidth / 2))
+        const y = (elem.offsetTop - this.ball.clientHeight)
+        this.moveTo(x, y)
+    }
+
+    // X方向の速度を変更する
+    setSpeed(speed) { this.speed.x = speed }
+
     // X方向の速度を逆転する
     turnX() { this.speed.x *= -1 }
 
@@ -126,6 +190,40 @@ class Ball {
  * 内部に特典情報を保持する
  */
 class Brick {
+    // ブロック要素の初期化と、得点情報の初期化
+    constructor(x, y, points) {
+        this.brick = document.createElement("div");
+        this.brick.setAttribute('class', 'brick');
+        this.brick.style.left = x + 'px';
+        this.brick.style.top = y + 'px';
+
+        this.brick.innerText = points;
+    }
+
+    // ブロック要素を返す
+    element() { return this.brick }
+
+    // ボールの位置を返す
+    // top, bottom, right, left, width, height, 
+    rect() { return this.brick.getBoundingClientRect() }
+
+    // 自分を包含する親要素から自分自身を削除する
+    remove() { this.brick.parentNode.removeChild(this.brick) }
+
+    // ボールとの衝突判定
+    isCollide(ball) {
+        const rect = this.rect()
+        var rectBall = ball.rect();
+
+        if (rect.bottom < rectBall.top || rect.top > rectBall.bottom ||
+            rect.right < rectBall.left || rect.left > rectBall.right) {
+            return false
+        }
+        return true
+    }
+    
+    // ボールの得点を返す
+    points() { return parseInt(this.brick.innerText) }
 }
 
 /**
@@ -135,33 +233,43 @@ class Brick {
  * ゲームのルールのロジックを実装する
  */
 class BreakOut {
+    // 各要素の参照取得してリスナーを登録する
+    // ブロックを作成する
     constructor() {
-        this.status = 'initial'  // 状態の初期化
-        this.animation = null
-
+        this.status = 'initial'
         this.container = new Container(document.querySelector('#container'))
         this.paddle = new Paddle(document.querySelector('#paddle'))
         this.ball = new Ball(document.querySelector('#ball'))
+        this.livesSpan = document.querySelector("#lives");
+        this.pointsSpan = document.querySelector("#points");
         this.button = document.querySelector("#start")
 
-        // キーイベントのリスナーの追加。
+        this.button.addEventListener("click", this.start.bind(this))
         document.addEventListener("keydown", this.keyDown.bind(this))
         document.addEventListener("keyup", this.keyUp.bind(this))
 
-        // ボタンリスナーの登録
-        this.button.addEventListener("click", this.start.bind(this))
+        this.setupBricks(3)
+        this.animation = null
     }
 
-    // キーが押された時の処理
-    keyDown(e) {
-        e.preventDefault()
-        this.paddle.keyDown(e)
-    }
+    // 指定した行数のブロックの作成する。
+    // ブロックの大きさは、80px, 50pxで固定
+    // ポイントは乱数で決める
+    setupBricks(numRow) {
+        const width = this.container.rect().width
+        for (let row = 0; row < numRow; ++row) {
 
-    // キーが離された時の処理
-    keyUp(e) {
-        e.preventDefault()
-        this.paddle.keyUp(e)
+            let x = width % 100 / 2
+            let y = row * 70
+
+            while (x < width - 100) {
+                let point = Math.ceil(Math.random() * 10 + 2)
+                let brick = new Brick(x, y, point)
+                this.container.append(brick)
+                x += 100
+            }
+        }
+
     }
 
     // スタートボタンが押された時の処理
@@ -182,10 +290,42 @@ class BreakOut {
         }
     }
 
+    // ゲームを停止して、メッセージを表示する
+    finish(message) {
+        this.status = 'finish'
+        this.container.show(message)
+        if (this.animation !== null) {
+            cancelAnimationFrame(this.animation)
+        }
+        this.animation = null
+    }
+
+    // キーが離された時の処理
+    keyUp(e) {
+        e.preventDefault()
+        if (this.status === 'waiting' && e.key === 'ArrowUp') {
+            this.status = 'moving'
+        }
+        this.paddle.keyUp(e)
+    }
+
+    // キーが押された時の処理
+    keyDown(e) {
+        e.preventDefault()
+        this.paddle.keyDown(e)
+    }
+
     // ボールの衝突判定
     // パドルに当たれば、速度を変更する
     // コンテナに当たれば、速度を反転する
     bounceBall() {
+        const hitPosion = this.paddle.isCollide(this.ball)
+        if (!Number.isNaN(hitPosion)) {
+            this.ball.setSpeed(hitPosion)
+            this.ball.turnY()
+            return "paddle"
+        }
+
         const bounce = this.container.isCollide(this.ball)
         if (bounce === "right" || bounce === "left") {
             this.ball.turnX()
@@ -193,6 +333,32 @@ class BreakOut {
             this.ball.turnY()
         }
         return bounce
+    }
+
+    // ブロックの衝突判定
+    // ブロックに当たれば、方向を反転して、ポイントを加算する
+    judgeHittingBlock() {
+        const brick = this.container.removeHitBlock(this.ball)
+        if (brick !== null) {
+            this.ball.turnY()
+            this.countup(brick)
+        }
+    }
+
+    // ポイントを加算して、表示する
+    countup(brick) {
+        let points = parseInt(this.pointsSpan.innerText)
+        points += brick.points()
+        this.pointsSpan.innerText = points
+        return points
+    }
+
+    // ライフを減少させて、表示する
+    decrementLives() {
+        let lives = parseInt(this.livesSpan.innerText)
+        --lives
+        this.livesSpan.innerText = lives
+        return lives
     }
 
     // アニメーションのアップデート
@@ -203,9 +369,30 @@ class BreakOut {
     // ブロックがなくなれば、成功で終了する
     update() {
         this.paddle.move()
-        this.ball.move()
-        this.bounceBall()
-        
+
+        if (this.status === 'finish' || this.status === 'initial') {
+            return
+        } else if (this.status === 'waiting') {
+            this.ball.moveToOn(this.paddle.element())
+        } else {
+            this.ball.move()
+
+            if (this.bounceBall() === 'bottom') {
+                const lives = this.decrementLives()
+                if (lives <= 0) {
+                    this.finish('Game Over')
+                    return
+                } else {
+                    this.status = 'waiting'
+                }
+            }
+
+            this.judgeHittingBlock()
+            if (this.container.numOfBlocks() === 0) {
+                this.finish('Complete')
+                return
+            }
+        }
         this.animation = requestAnimationFrame(this.update.bind(this));
     }
 }
