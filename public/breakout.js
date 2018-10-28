@@ -20,6 +20,28 @@ class Container {
 class Paddle {
     constructor(element) {
         this.paddle = element
+        this.direction = 'stop'
+    }
+
+    // キーが押された時に呼び出される。
+    // 押されたキーの種類によって、"right"、"left"に状態を変更する
+    keyDown(event) {
+        if (event.key === "ArrowRight") {
+            this.direction = "right"
+            console.log(this.direction)
+        } else if (event.key === "ArrowLeft") {
+            this.direction = "left"
+            console.log(this.direction)
+        }
+    }
+
+    // キーが離された時に呼び出される
+    // 離されたキーの種類によって、"stop"に状態を変更する
+    keyUp(event) {
+        if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+            this.direction = "stop"
+            console.log(this.direction)
+        }
     }
 }
 
@@ -57,6 +79,33 @@ class BreakOut {
         this.paddle = new Paddle(document.querySelector('#paddle'))
         this.ball = new Ball(document.querySelector('#ball'))
         this.button = document.querySelector("#start")
+
+        // キーイベントのリスナーの追加。
+        document.addEventListener("keydown", this.keyDown.bind(this))
+        document.addEventListener("keyup", this.keyUp.bind(this))
+
+        // ボタンリスナーの登録
+        this.button.addEventListener("click", this.start.bind(this))
+    }
+
+    // キーが押された時の処理
+    keyDown(e) {
+        e.preventDefault()
+        this.paddle.keyDown(e)
+    }
+
+    // キーが離された時の処理
+    keyUp(e) {
+        e.preventDefault()
+        this.paddle.keyUp(e)
+    }
+
+    // スタートボタンが押された時の処理
+    // すでに終了していれば、reloadで初期状態から開始する
+    // 停止状態であれば、ボールを待ち状態にして開始
+    // 動作中であれば、アニメーションを停止する
+    start() {
+        console.log("Start")
     }
 }
 
