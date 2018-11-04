@@ -220,6 +220,25 @@ class BreakOut {
 
         // ボタンリスナーの登録
         this.button.addEventListener("click", this.start.bind(this))
+
+        this.setupBricks(3)
+    }
+
+    // 指定した行数のブロックの作成する。
+    // ブロックの大きさは、80px, 50pxで固定
+    setupBricks(numRow) {
+        const width = this.container.rect().width
+        for (let row = 0; row < numRow; ++row) {
+
+            let x = width % 100 / 2
+            let y = row * 70
+
+            while (x < width - 100) {
+                let brick = new Brick(x, y)
+                this.container.append(brick)
+                x += 100
+            }
+        }
     }
 
     // キーが押された時の処理
