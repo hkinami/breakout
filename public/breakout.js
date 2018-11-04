@@ -44,6 +44,23 @@ class Paddle {
         this.direction = 'stop'
     }
 
+    // パドルの位置を返す
+    // top, bottom, right, left, width, height, 
+    rect() { return this.paddle.getBoundingClientRect() }
+
+    // ボールが衝突していればTrueを返す
+    isCollide(ball) {
+        const rect = this.rect()
+        var rectBall = ball.rect();
+
+        if (rect.bottom < rectBall.top || rect.top > rectBall.bottom ||
+            rect.right < rectBall.left || rect.left > rectBall.right) {
+            return false
+        }
+
+        return true
+    }
+
     // キーが押された時に呼び出される。
     // 押されたキーの種類によって、"right"、"left"に状態を変更する
     keyDown(event) {
@@ -61,7 +78,6 @@ class Paddle {
             this.direction = "stop"
         }
     }
-
 
     // パドルの位置を状態に応じて移動させる
     move() {
@@ -183,9 +199,15 @@ class BreakOut {
     }
 
     // ボールの衝突判定
-    // パドルに当たれば、速度を変更する
-    // コンテナに当たれば、速度を反転する
+    // パドルに当たれば、速度を反転して、paddleを返す
+    // コンテナに当たれば、速度を反転して、衝突した面を返す
     bounceBall() {
+        const hit = this.paddle.isCollide(this.ball)
+        if (hit) {
+            this.ball.turnY()
+            return "paddle"
+        }
+
         const bounce = this.container.isCollide(this.ball)
         if (bounce === "right" || bounce === "left") {
             this.ball.turnX()
