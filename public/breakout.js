@@ -290,6 +290,15 @@ class BreakOut {
         return bounce
     }
 
+    // ブロックの衝突判定
+    // ブロックに当たれば、方向を反転して、ポイントを加算する
+    judgeHittingBlock() {
+        const brick = this.container.removeHitBlock(this.ball)
+        if (brick !== null) {
+            this.ball.turnY()
+        }
+    }
+
     // アニメーションのアップデート
     // 開始状態、終了状態では何もしない
     // 待ち状態の時には、ボールをパドルの上に表示する
@@ -300,6 +309,9 @@ class BreakOut {
         this.paddle.move()
         this.ball.move()
         this.bounceBall()
+
+        //  衝突したブロックの判定
+        this.judgeHittingBlock()
         
         this.animation = requestAnimationFrame(this.update.bind(this));
     }
