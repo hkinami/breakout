@@ -20,11 +20,11 @@ class Container {
         const rec = this.rect()
         if (ball.offsetLeft() <= 0) {
             return "left"
-        } else if (rec.width <= ball.offsetLeft()) {
+        } else if ((rec.width - ball.rect().width) <= ball.offsetLeft()) {
             return "right"
         } else if (ball.offsetTop() <= 0) {
             return "top"
-        } else if (rec.height <= ball.offsetTop()) {
+        } else if ((rec.height - ball.rect().height) <= ball.offsetTop()) {
             return "bottom"
         }
         return ""
