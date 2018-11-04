@@ -8,6 +8,31 @@ class Container {
     // コンテナー要素の初期化と、ブロックの配列の初期化
     constructor(element) {
         this.container = element
+        this.bricks = []
+    }
+
+    // 現在のブロックの数を返す
+    numOfBlocks() {
+        return this.bricks.length
+    }
+
+    // ブロックを追加する
+    append(brick) {
+        this.bricks.push(brick)
+        this.container.appendChild(brick.element())
+    }
+
+    // ブロックがボールに衝突していれば、ブロックを取り出して、配列から削除する
+    // 削除したブロックを返す
+    removeHitBlock(ball) {
+        const index = this.bricks.findIndex((brick) => brick.isCollide(ball))
+        if (index >= 0) {
+            const brick = this.bricks[index]
+            brick.remove()
+            this.bricks.splice(index, 1)
+            return brick
+        }
+        return null
     }
 
     // コンテナーの位置とサイズの情報を返す
