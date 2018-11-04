@@ -142,6 +142,35 @@ class Ball {
  * 内部に特典情報を保持する
  */
 class Brick {
+    // ブロック要素の初期化と、得点情報の初期化
+    constructor(x, y, points) {
+        this.brick = document.createElement("div");
+        this.brick.setAttribute('class', 'brick');
+        this.brick.style.left = x + 'px';
+        this.brick.style.top = y + 'px';
+    }
+
+    // ブロック要素を返す
+    element() { return this.brick }
+
+    // ボールの位置を返す
+    // top, bottom, right, left, width, height, 
+    rect() { return this.brick.getBoundingClientRect() }
+
+    // 自分を包含する親要素から自分自身を削除する
+    remove() { this.brick.parentNode.removeChild(this.brick) }
+
+    // ボールとの衝突判定
+    isCollide(ball) {
+        const rect = this.rect()
+        var rectBall = ball.rect();
+
+        if (rect.bottom < rectBall.top || rect.top > rectBall.bottom ||
+            rect.right < rectBall.left || rect.left > rectBall.right) {
+            return false
+        }
+        return true
+    }
 }
 
 /**
