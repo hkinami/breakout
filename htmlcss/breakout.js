@@ -187,8 +187,8 @@ class Brick {
     // top, bottom, right, left, width, height, 
     rect() { return this.brick.getBoundingClientRect() }
 
-    // 自分を包含する親要素から自分自身を削除する
-    remove() { this.brick.parentNode.removeChild(this.brick) }
+    // brick offのClassを設定して、表示を消す
+    remove() { this.brick.setAttribute('class', 'brick off') }
 
     // ボールとの衝突判定
     isCollide(ball) {
@@ -307,9 +307,10 @@ class BreakOut {
     }
 
     showAndFinish(message) {
-        const h1 = document.createElement('h1')
-        h1.innerText = message
-        this.container.container.appendChild(h1)
+        const div = document.createElement('div')
+        div.setAttribute('class', 'message')
+        div.innerText = message
+        this.container.container.appendChild(div)
 
         this.status = 'finish'
         this.animation = null

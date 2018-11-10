@@ -1,12 +1,19 @@
 
     body {
       background-color: wheat;
+      font-family: 'Creepster', cursive;
     }
     
     h1 {
       font-size: 48px;
       text-align: center;
       color: brown;
+      transition: all 2s ease-in-out;
+    }
+
+    h1:hover {
+      transform: rotateX(360deg) scale(2,2);
+      color: black;
     }
 
     .controll {
@@ -24,6 +31,37 @@
       color: white;
       font-size: 24px;
       text-align: center;
+    }
+
+    .brick.off {
+      animation-duration: 1s; 
+      animation-name: hit-brik; 
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes hit-brik {
+      0% {
+        transform: scale(1,1);
+      }
+      25% {
+        transform: translate(0,25px) rotateX(-30deg) scale(1.2,1.2);
+        border-radius: 10%;
+        background-color: red;
+      }
+      50% {
+        transform: translate(0,50px) rotateX(30deg) scale(0.8,0.8);
+        border-radius: 30%;
+        background-color: pink;
+      }
+      75% {
+        transform: translate(0,100px) rotateX(150deg) scale(0.6,0.6);
+        border-radius: 50%;
+        background-color: gold;
+      }
+      100% {
+        transform: translate(0,400px) rotateX(360deg) scale(0.1,0.1) ;
+        background-color: black;
+      }
     }
 
     .message {
