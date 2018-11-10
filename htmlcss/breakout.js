@@ -301,6 +301,15 @@ class BreakOut {
         return -1
     }
 
+    showAndFinish(message) {
+        const h1 = document.createElement('h1')
+        h1.innerText = message
+        this.container.container.appendChild(h1)
+
+        this.status = 'finish'
+        this.animation = null
+    }
+
     // アニメーションのアップデート
     // 開始状態、終了状態では何もしない
     // 待ち状態の時には、ボールをパドルの上に表示する
@@ -314,14 +323,16 @@ class BreakOut {
 
         // ボールが壁かパドルに当たった場合の判定
         const bounce = this.bounceBall()
-        if (bounce != '') {
-            console.log(bounce)
+        if (bounce === 'bottom') {
+            this.showAndFinish('Game Over')
+            return
         }
 
         //  衝突したブロックの判定
         const numOfBlocks = this.judgeHittingBlock()
-        if (numOfBlocks >= 0) {
-            console.log(numOfBlocks)
+        if (numOfBlocks === 0) {
+            this.showAndFinish('Complate')
+            return
         }
         
         this.animation = requestAnimationFrame(this.update.bind(this));
