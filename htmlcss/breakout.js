@@ -75,11 +75,11 @@ class Paddle {
 
     // ボールが衝突していればTrueを返す
     isCollide(ball) {
-        const rect = this.rect()
+        const rectPaddle = this.rect()
         var rectBall = ball.rect();
 
-        if (rect.bottom < rectBall.top || rect.top > rectBall.bottom ||
-            rect.right < rectBall.left || rect.left > rectBall.right) {
+        if (rectPaddle.bottom < rectBall.top || rectPaddle.top > rectBall.bottom ||
+            rectPaddle.right < rectBall.left || rectPaddle.left > rectBall.right) {
             return false
         }
 
@@ -296,7 +296,9 @@ class BreakOut {
         const brick = this.container.removeHitBlock(this.ball)
         if (brick !== null) {
             this.ball.turnY()
+            return this.container.numOfBlocks()
         }
+        return -1
     }
 
     // アニメーションのアップデート
@@ -306,12 +308,21 @@ class BreakOut {
     // コンテナーの下に衝突したら、ライフを減少
     // ブロックがなくなれば、成功で終了する
     update() {
+        // ボールとパドルを移動する
         this.paddle.move()
         this.ball.move()
-        this.bounceBall()
+
+        // ボールが壁かパドルに当たった場合の判定
+        const bounce = this.bounceBall()
+        if (bounce != '') {
+            console.log(bounce)
+        }
 
         //  衝突したブロックの判定
-        this.judgeHittingBlock()
+        const numOfBlocks = this.judgeHittingBlock()
+        if (numOfBlocks >= 0) {
+            console.log(numOfBlocks)
+        }
         
         this.animation = requestAnimationFrame(this.update.bind(this));
     }
