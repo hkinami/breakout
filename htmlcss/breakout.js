@@ -73,17 +73,18 @@ class Paddle {
     // top, bottom, right, left, width, height, 
     rect() { return this.paddle.getBoundingClientRect() }
 
-    // ボールが衝突していればTrueを返す
+    // ボールが衝突していれば-5から+5の数値を返す
     isCollide(ball) {
         const rectPaddle = this.rect()
         var rectBall = ball.rect();
 
         if (rectPaddle.bottom < rectBall.top || rectPaddle.top > rectBall.bottom ||
             rectPaddle.right < rectBall.left || rectPaddle.left > rectBall.right) {
-            return false
+            return Number.NaN
         }
 
-        return true
+        const hitPosition = ((rectBall.x - rectPaddle.x) / rectPaddle.width) * 10 - 5
+        return hitPosition
     }
 
     // キーが押された時に呼び出される。
@@ -159,6 +160,10 @@ class Ball {
 
     // Y方向の速度を逆転する
     turnY() { this.speed.y *= -1 }
+
+    // Y方向の速度を逆転するして、X方向の速度を設定する
+    turn(speed) { this.speed.y *= -1; this.speed.x = speed } 
+
 }
 
 /**
@@ -276,8 +281,8 @@ class BreakOut {
     // コンテナに当たれば、速度を反転して、衝突した面を返す
     bounceBall() {
         const hit = this.paddle.isCollide(this.ball)
-        if (hit) {
-            this.ball.turnY()
+        if (! Number.isNaN(hit)) {
+            this.ball.turn(hit)
             return "paddle"
         }
 
