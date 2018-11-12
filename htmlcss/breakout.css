@@ -1,7 +1,6 @@
 
     body {
       background-color: wheat;
-      font-family: 'Creepster', cursive;
       perspective: 1000px;
     }
     
@@ -42,12 +41,27 @@
       background-color: black;
     }
 
-    .brick.off {
-      transform: translate(0,70px) rotateX(360deg);
-      background-color: black;
+    .off {
+      animation-duration: 3s; 
+      animation-name: hit-brik; 
+      animation-fill-mode: forwards;
     }
 
-
+    @keyframes hit-brik {
+      0% {
+        transform: scale(1,1);
+      }
+      33% {
+        transform: scale(1.2, 1.2);
+      }
+      66% {
+        transform: scale(0.5,0.5);
+      }
+      100% {
+        transform: scale(0,0);
+      }
+    }
+    
     .message {
       position: absolute;
       top: 40%;
