@@ -16,7 +16,7 @@ let state = {
         y: 470,    // パドルのY座標
         w: 80,     // パドルの幅
         h: 10,     // パドルの高さ
-        dir: "stop"     // パドルの動く方向
+        xv: 0    // パドルのX方向の速度
     },
     bricks: [     // ブロック {x座標、y座標、w幅、h高さ}
         { x: 20, y: 10, w: 80, h: 50 }, { x: 220, y: 10, w: 80, h: 50 }, { x: 400, y: 10, w: 80, h: 50 },
@@ -89,11 +89,7 @@ function ball() {
 }
 
 function paddle() {
-    if (state.paddle.dir == "right") {
-        state.paddle.x += 5
-    } else if (state.paddle.dir == "left") {
-        state.paddle.x -= 5
-    }
+    state.paddle.x += state.paddle.xv
 }
 
 function update() {
@@ -114,15 +110,15 @@ function start() {
 
 function keyUp(e) {
     if (e.key == "ArrowRight" || e.key == "ArrowLeft") {
-        state.paddle.dir = "stop"
+        state.paddle.xv = 0
     }
 }
 
 function keyDown(e) {
     if (e.key == "ArrowRight") {
-        state.paddle.dir = "right"
+        state.paddle.xv = 5
     } else if (e.key == "ArrowLeft") {
-        state.paddle.dir = "left"
+        state.paddle.xv = -5
     }
 }
 
