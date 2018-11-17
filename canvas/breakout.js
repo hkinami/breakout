@@ -1,8 +1,7 @@
-"use strict"
 let state = {
-    container: {
-        w: 500,  // コンテナの幅
-        h: 500   // コンテナの高さ
+    field: {
+        w: 500,  // フィールドの幅
+        h: 500   // フィールドの高さ
     },
     ball: {
         x: 250,    // ボールのX座標
@@ -27,7 +26,7 @@ let state = {
 let ctx = null  // Canvas描画用のコンテキスト
 
 function draw() {
-    ctx.clearRect(0, 0, state.container.w, state.container.h)
+    ctx.clearRect(0, 0, state.field.w, state.field.h)
 
     ctx.beginPath()
     ctx.fillStyle = 'white'
@@ -48,11 +47,11 @@ function draw() {
     }
 }
 
-function briks() {
-    state.bricks =  state.bricks.filter(nonhit)
+function bricks() {
+    state.bricks =  state.bricks.filter(notHit)
 }
 
-function nonhit(rect) {
+function notHit(rect) {
     return !hit(rect)
 }
 
@@ -70,10 +69,10 @@ function ball() {
     state.ball.x += state.ball.xv
     state.ball.y += state.ball.yv
 
-    if (state.ball.x < 0 || state.ball.x > state.container.w) {
+    if (state.ball.x < 0 || state.ball.x > state.field.w) {
         state.ball.xv *= -1
     }
-    if (state.ball.y < 0 || state.ball.y > state.container.h) {
+    if (state.ball.y < 0 || state.ball.y > state.field.h) {
         state.ball.yv *= -1
     }
     if (hit(state.paddle)) {
@@ -95,17 +94,15 @@ function paddle() {
 function update() {
     paddle()
     ball()
-    briks()
+    bricks()
 }
-
 
 function start() {
     update()
     draw()
-    if (state.bricks.length == 0) {
-        return
+    if (state.bricks.length != 0) {
+        window.requestAnimationFrame(start)
     }
-    window.requestAnimationFrame(start)
 }
 
 function keyUp(e) {
@@ -122,7 +119,7 @@ function keyDown(e) {
     }
 }
 
-// HTML, CSSが読み込まれると呼び出される関数
+// HTML, CSSが読み込まれると呼び出される関数。window.onloadに設定する
 function initialize() {
     window.addEventListener('keydown', keyDown)
     window.addEventListener('keyup', keyUp)
