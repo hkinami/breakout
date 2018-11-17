@@ -1,3 +1,6 @@
+// ブロック崩しゲーム
+
+// ゲームの状態
 let state = {
     field: {
         w: 500,  // フィールドの幅
@@ -23,23 +26,30 @@ let state = {
         { x: 20, y: 130, w: 80, h: 50 }, { x: 220, y: 130, w: 80, h: 50 }, { x: 400, y: 130, w: 80, h: 50 },
     ]
 }
-let ctx = null  // Canvas描画用のコンテキスト
 
+// Canvas描画用のコンテキスト
+let ctx = null
+
+// キャンバスに状態を書き込む
 function draw() {
+    // キャンバスをクリア
     ctx.clearRect(0, 0, state.field.w, state.field.h)
 
+    // パスを開始。パドルを四角(rect)で描画。ボールを丸(arc)で描画
     ctx.beginPath()
-    ctx.fillStyle = 'white'
     ctx.rect(state.paddle.x, state.paddle.y, state.paddle.w, state.paddle.h)
     ctx.arc(state.ball.x, state.ball.y, state.ball.r, 0, Math.PI * 2, false)
+    ctx.fillStyle = 'white'
     ctx.fill()
 
+    // それぞれのブロックを四角で描画。(fillRect)
     ctx.fillStyle = 'blue'
-    for(let i=0; i < state.bricks.length; ++i) {
+    for (let i = 0; i < state.bricks.length; ++i) {
         let brick = state.bricks[i]
         ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
     }
 
+    // 全てのブロックがなければ、"Complete"を描画
     if (state.bricks.length == 0) {
         ctx.font = '48px serif'
         ctx.strokeStyle = "red"
@@ -47,39 +57,57 @@ function draw() {
     }
 }
 
+// 衝突ブロックの削除
 function bricks() {
-    state.bricks =  state.bricks.filter(notHit)
+    // 衝突指定ないブロックのリストを作成して、再設定
+    state.bricks = state.bricks.filter(notHit)
 }
 
+// 衝突していないなら、true
 function notHit(rect) {
-    return !hit(rect)
-}
-
-function hit(rect) {
+    // ぶつかっていない状態の判定
     if (state.ball.y + state.ball.r < rect.y ||
         state.ball.y - state.ball.r > rect.y + rect.h ||
         state.ball.x + state.ball.r < rect.x ||
         state.ball.x - state.ball.r > rect.x + rect.w) {
+        return true
+    }
+    return false
+}
+
+// ボールと、パドル/ブロックの衝突判定。衝突していれば、true
+function hit(rect) {
+    if ( notHit(rect) ) {
         return false
     }
     return true
 }
 
+// ボールの移動と、衝突判定
 function ball() {
+
+    // ボールの移動
     state.ball.x += state.ball.xv
     state.ball.y += state.ball.yv
 
+    // 左右の枠に衝突したら、左右の方向を反転する
     if (state.ball.x < 0 || state.ball.x > state.field.w) {
         state.ball.xv *= -1
     }
+
+    // 上下の枠に衝突したら、上下の方向を反転する
     if (state.ball.y < 0 || state.ball.y > state.field.h) {
         state.ball.yv *= -1
     }
+
+    // パドルに衝突したら、上下の方向を反転
     if (hit(state.paddle)) {
         state.ball.yv *= -1
     }
 
-    for(let i=0; i < state.bricks.length; ++i) {
+    // 残っているブロックを全て調査
+    for (let i = 0; i < state.bricks.length; ++i) {
+        // ブロックに衝突したら、上下の方向を反転
         let brick = state.bricks[i]
         if (hit(brick)) {
             state.ball.yv *= -1
@@ -87,35 +115,46 @@ function ball() {
     }
 }
 
+// パドルの移動
 function paddle() {
     state.paddle.x += state.paddle.xv
 }
 
+// 状態を更新する（ボールとパドルの移動、ブロックの削除）
 function update() {
-    paddle()
-    ball()
-    bricks()
+    paddle()  // パドルの移動
+    ball()    // ボールの移動
+    bricks()  // ブロックの削除
 }
 
+// スタートボタンが押された時の関数
 function start() {
+
+    // 状態を更新する（ボールとパドルの移動、ブロックの削除）
     update()
+
+    // 更新した情報を描画する
     draw()
+
+    // ブロックが残っていれば、もう一度startを呼び出して次の処理を行う
     if (state.bricks.length != 0) {
         window.requestAnimationFrame(start)
     }
 }
 
+// キーが離された時の関数
 function keyUp(e) {
     if (e.key == "ArrowRight" || e.key == "ArrowLeft") {
         state.paddle.xv = 0
     }
 }
 
+// キーが押された時に呼び出される関数
 function keyDown(e) {
     if (e.key == "ArrowRight") {
-        state.paddle.xv = 5
+        state.paddle.xv = 5  // 右方向への速度を5にする
     } else if (e.key == "ArrowLeft") {
-        state.paddle.xv = -5
+        state.paddle.xv = -5  // 左方向の速度を5にする (-5)
     }
 }
 
