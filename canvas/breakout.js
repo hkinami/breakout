@@ -1,6 +1,5 @@
-
+"use strict"
 let state = {
-    ctx: null,  // 描画用のコンテキスト
     container: {
         w: 500,  // コンテナの幅
         h: 500   // コンテナの高さ
@@ -25,102 +24,98 @@ let state = {
         { x: 20, y: 130, w: 80, h: 50 }, { x: 220, y: 130, w: 80, h: 50 }, { x: 400, y: 130, w: 80, h: 50 },
     ]
 }
+let ctx = null  // Canvas描画用のコンテキスト
 
-function draw(s) {
-    s.ctx.clearRect(0, 0, s.container.w, s.container.h)
+function draw() {
+    ctx.clearRect(0, 0, state.container.w, state.container.h)
 
-    s.ctx.beginPath()
-    s.ctx.fillStyle = 'white'
-    s.ctx.rect(s.paddle.x, s.paddle.y, s.paddle.w, s.paddle.h)
-    s.ctx.arc(s.ball.x, s.ball.y, s.ball.r, 0, Math.PI * 2, false)
-    s.ctx.fill()
+    ctx.beginPath()
+    ctx.fillStyle = 'white'
+    ctx.rect(state.paddle.x, state.paddle.y, state.paddle.w, state.paddle.h)
+    ctx.arc(state.ball.x, state.ball.y, state.ball.r, 0, Math.PI * 2, false)
+    ctx.fill()
 
-    s.ctx.fillStyle = 'blue'
-    s.bricks.forEach((brick) => {
-        s.ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
-    })
+    ctx.fillStyle = 'blue'
+    for(let i=0; i < state.bricks.length; ++i) {
+        let brick = state.bricks[i]
+        ctx.fillRect(brick.x, brick.y, brick.w, brick.h)
+    }
 
-    if (s.bricks.length == 0) {
-        s.ctx.font = '48px serif'
-        s.ctx.strokeStyle = "red"
-        s.ctx.strokeText('Complete', 150, 250)
+    if (state.bricks.length == 0) {
+        ctx.font = '48px serif'
+        ctx.strokeStyle = "red"
+        ctx.strokeText('Complete', 150, 250)
     }
 }
 
-function paddle(paddle) {
-    if (paddle.dir == "right") {
-        paddle.x += 5
-    } else if (paddle.dir == "left") {
-        paddle.x -= 5
-    }
-    return paddle
+function briks() {
+    state.bricks =  state.bricks.filter(nonhit)
 }
 
-function ball(ball, container, paddle, bricks) {
-    ball.x += ball.xv
-    ball.y += ball.yv
-
-    if (ball.x < 0 || ball.x > container.w) {
-        ball.xv *= -1
-    }
-    if (ball.y < 0 || ball.y > container.h) {
-        ball.yv *= -1
-    }
-    if (hit(ball, paddle)) {
-        ball.yv *= -1
-    }
-    bricks.forEach((brick) => {
-        if (hit(ball, brick)) {
-            ball.yv *= -1
-        }
-    })
-    return ball
+function nonhit(rect) {
+    return !hit(rect)
 }
 
-function briks(briks, ball) {
-    return briks.filter((brick) => {
-        if (hit(ball, brick)) {
-            return false
-        } else {
-            return true
-        }
-    })
-}
-
-function hit(ball, rect) {
-    if (ball.y + ball.r < rect.y ||
-        ball.y - ball.r > rect.y + rect.h ||
-        ball.x + ball.r < rect.x ||
-        ball.x - ball.r > rect.x + rect.w) {
+function hit(rect) {
+    if (state.ball.y + state.ball.r < rect.y ||
+        state.ball.y - state.ball.r > rect.y + rect.h ||
+        state.ball.x + state.ball.r < rect.x ||
+        state.ball.x - state.ball.r > rect.x + rect.w) {
         return false
     }
     return true
 }
 
-function update(s) {
-    s.paddle = paddle(s.paddle)
-    s.ball = ball(s.ball, s.container, s.paddle, s.bricks)
-    s.bricks = briks(s.bricks, s.ball)
-    return s
-}
+function ball() {
+    state.ball.x += state.ball.xv
+    state.ball.y += state.ball.yv
 
-let animation = null
-function start() {
-    if (animation == null) {
-        animation = requestAnimationFrame(animationFrame)
-    } else {
-        cancelAnimationFrame(animation)
-        animation = null
+    if (state.ball.x < 0 || state.ball.x > state.container.w) {
+        state.ball.xv *= -1
+    }
+    if (state.ball.y < 0 || state.ball.y > state.container.h) {
+        state.ball.yv *= -1
+    }
+    if (hit(state.paddle)) {
+        state.ball.yv *= -1
+    }
+
+    for(let i=0; i < state.bricks.length; ++i) {
+        let brick = state.bricks[i]
+        if (hit(brick)) {
+            state.ball.yv *= -1
+        }
     }
 }
 
-function animationFrame() {
-    state = update(state)
-    draw(state)
+function paddle() {
+    if (state.paddle.dir == "right") {
+        state.paddle.x += 5
+    } else if (state.paddle.dir == "left") {
+        state.paddle.x -= 5
+    }
+}
+
+function update() {
+    paddle()
+    ball()
+    briks()
+}
+
+
+function start() {
+    update()
+    draw()
     if (state.bricks.length == 0) {
         return
     }
-    animation = requestAnimationFrame(animationFrame)
+    window.requestAnimationFrame(start)
+}
+
+function keyUp(e) {
+    if (e.key == "ArrowRight" || e.key == "ArrowLeft") {
+        state.paddle.dir = "stop"
+    }
 }
 
 function keyDown(e) {
@@ -131,24 +126,18 @@ function keyDown(e) {
     }
 }
 
-function keyUp(e) {
-    if (e.key == "ArrowRight" || e.key == "ArrowLeft") {
-        state.paddle.dir = "stop"
-    }
-}
-
 // HTML, CSSが読み込まれると呼び出される関数
 function initialize() {
     window.addEventListener('keydown', keyDown)
     window.addEventListener('keyup', keyUp)
 
-    let button = document.querySelector('#start')
+    let button = window.document.getElementById('start')
     button.addEventListener('click', start)
 
-    canvas = document.querySelector('#canvas')
-    state.ctx = canvas.getContext("2d")
+    let canvas = document.getElementById('canvas')
+    ctx = canvas.getContext("2d")
 
-    draw(state)
+    draw()
 }
 
 window.onload = initialize
